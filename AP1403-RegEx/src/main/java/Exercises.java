@@ -9,7 +9,7 @@ public class Exercises {
         complete the method below, so it will validate an email address
     */
     public boolean validateEmail(String email) {
-        String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        String regex = "^[A-Za-z0-9+_.-%]+[^.]@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
@@ -21,7 +21,10 @@ public class Exercises {
         if there's no match for a date, return null
     */
     public String findDate(String string) {
-        String regex = "\\b(\\d{1,2})[-/](\\d{1,2})[-/](\\d{4})\\b";
+        String regex = "(\\b(\\d{4})[-/](0[1-9]|1[0-2])[-/](0[1-9]|[12][0-9]|3[01])\\b)|" +
+                "(\\b(\\d{4})[-/](0[1-9]|1[0-2])[-/](0[1-9]|[12][0-9]|3[01])\\b)|" +
+                "(\\b(0[1-9]|1[0-2])[-/](0[1-9]|[12][0-9]|3[01])[-/](\\d{4})\\b)|" +
+                "(\\b(0[1-9]|1[0-2])[-/](0[1-9]|[12][0-9]|3[01])[-/](\\d{4})\\b)";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(string);
         return matcher.find() ? matcher.group() : null;
@@ -38,12 +41,15 @@ public class Exercises {
         - has no white-space in it
     */
     public int findValidPasswords(String string) {
-        String regex = "(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}";
+        String regex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[!@#$%^&*])[\\S]{8,}$";
         Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(string);
         int count = 0;
-        while (matcher.find()) {
-            count++;
+        String check [] = string.split("\\s+")
+        for (String variable : check) {
+            Matcher matcher = pattern.matcher(variable) ;
+             if (matcher.matches()) {
+                 count++;
+             }
         }
         return count;
     }
@@ -54,50 +60,30 @@ public class Exercises {
 
         note: your implementation should be case-insensitive, e.g. Aba -> is palindrome
     */
-    public List<String> findPalindromes(String string) {
+    public static List<String> findPalindromes(String string) {
         List<String> list = new ArrayList<>();
-        String regex = "\\b[a-zA-Z]{3,}\\b";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(string);
-        while (matcher.find()) {
-            String word = matcher.group();
-            if (isPalindrome(word)) {
-                list.add(word);
+        // todo
+        List<String> seen = new ArrayList<>();
+        String[] words = string.split("\\W+");
+
+        for (String word : words) {
+            if (word.length() >= 3) {
+                String lowerCaseWord = word.toLowerCase();
+                String reversedWord = new StringBuilder(lowerCaseWord).reverse().toString();
+
+                if (lowerCaseWord.equals(reversedWord) && !seen.contains(lowerCaseWord)) {
+                    list.add(word);
+                    seen.add(lowerCaseWord);
+                }
             }
         }
         return list;
     }
 
-    private boolean isPalindrome(String word) {
-        String lowerWord = word.toLowerCase();
-        return lowerWord.equals(new StringBuilder(lowerWord).reverse().toString());
-    }
 
     public static void main(String[] args) {
         Exercises ex = new Exercises();
 
-        // Test validateEmail
-        System.out.println("validateEmail Tests:");
-        System.out.println(ex.validateEmail("user@example.com")); // true
-        System.out.println(ex.validateEmail("invalid-email"));    // false
-        System.out.println(ex.validateEmail("test@domain"));     // false
-        System.out.println(ex.validateEmail("valid.email@domain.com")); // true
 
-        // Test findDate
-        System.out.println("\nfindDate Tests:");
-        System.out.println(ex.findDate("Today's date is 12/03/2024.")); // 12/03/2024
-        System.out.println(ex.findDate("No date here.")); // null
-        System.out.println(ex.findDate("Event on 3-5-2022.")); // 3-5-2022
-
-        // Test findValidPasswords
-        System.out.println("\nfindValidPasswords Tests:");
-        System.out.println(ex.findValidPasswords("StrongPass1!")); // 1
-        System.out.println(ex.findValidPasswords("weakpass")); // 0
-        System.out.println(ex.findValidPasswords("Pass1234! SecurePass2#")); // 2
-
-        // Test findPalindromes
-        System.out.println("\nfindPalindromes Tests:");
-        System.out.println(ex.findPalindromes("Madam, Anna and Civic are palindromes.")); // [Madam, Anna, Civic]
-        System.out.println(ex.findPalindromes("Hello World!")); // []
     }
 }
